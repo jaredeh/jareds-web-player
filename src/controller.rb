@@ -12,8 +12,12 @@ class Controller
       end
       @hosts[s.host][s.path] = s.id
     end
-    s = Static.find(1)
-    print "goto: http://localhost:3000/" + s.host + "/" + s.path + "\n"
+    if not Static.exists?(1)
+      print "goto: http://localhost:3000\n"
+    else
+      s = Static.find(1)
+      print "goto: http://localhost:3000/" + s.host + "/" + s.path + "\n"
+    end
   end
   
   

@@ -11,10 +11,17 @@ class JWPServlet < HTTPServlet::AbstractServlet
   end
   
   def pull_host(path)
-    return path.split('/')[1]
+    host = path.split('/')[1]
+    if host == nil
+      return ""
+    end
+    return host
   end
   
   def pull_path(path)
+    if path.split('/')[1] == nil
+      return ""
+    end
     print "path.split: " + path.split('/')[1] + " path: " + path + "\n"
     start = path.split('/')[1].length + 2
     send = path.length
@@ -23,6 +30,9 @@ class JWPServlet < HTTPServlet::AbstractServlet
   end
   
   def do_GET(request, response)
+    if request.path == nil
+      return response.body = "not found"
+    end
     host = pull_host(request.path)
     path = pull_path(request.path)
     if @ctrl.hosts[host] == nil
