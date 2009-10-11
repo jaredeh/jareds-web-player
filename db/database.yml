@@ -1,2 +1,4 @@
 adapter: sqlite3
 database: db/database.sqlite
+pool: 50
+timeout: 10000
