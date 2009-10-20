@@ -29,7 +29,9 @@ class Controller
       s = Static.find(id)
       txt += @hosts[s.host].to_s
       txt += "/"
-      txt += s.path
+      if s.path != nil
+        txt += s.path
+      end
       txt += "\n"
       print txt
     end
@@ -45,11 +47,18 @@ class Controller
   end
   
   def initialize_path(host,path,id)
+    if path == nil
+      path = ""
+    end
     port = @hosts[host]
     if @paths[port] == nil
       @paths[port] = Hash.new
     end
-    print "initialize_path('" + host + "=" + port.to_s + "','" + path + "','" + id.to_s + "')\n"
+    txt = "initialize_path('" + host
+    txt += "=" + port.to_s
+    txt += "','" + path
+    txt += "','" + id.to_s + "')\n"
+    print txt
     @paths[port][path] = id
   end
   

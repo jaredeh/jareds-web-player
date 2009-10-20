@@ -29,6 +29,9 @@ class ConvertMe
       req_header = parse_header(rs.Request_Header)
       resp_header = parse_header(rs.Response_Header)
       path = rs.URL.split(req_header['Host'] + "/")[1]
+      if path == nil
+        path = ""
+      end
       n = s.new do |t|
         t.host = req_header['Host']
         t.path = path

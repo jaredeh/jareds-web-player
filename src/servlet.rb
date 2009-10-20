@@ -14,7 +14,11 @@ class JWPServlet < HTTPServlet::AbstractServlet
     return "http://localhost:" + port.to_s
   end
   
-  def clean_path(path)
+  def clean_path(host,uri)
+    path = uri[host.length,uri.length]
+    if path.split('/')[0] == nil
+      return ""
+    end
     start = path.split('/')[0].length + 1
     send = path.length
     return path[start,send]
@@ -46,6 +50,7 @@ class JWPServlet < HTTPServlet::AbstractServlet
     #filter.push("Accept-Ranges")
     #filter.push("Server")
     filter.push("Expires")
+    filter.push("Content-Encoding")
     #filter.push("Cache-Control")
     #filter.push("Connection")
     return filter
@@ -56,6 +61,7 @@ class JWPServlet < HTTPServlet::AbstractServlet
     @ctrl.hosts.keys.each do |h|
       find = 'http://' + h +'/'
       replace = 'http://localhost:' + @ctrl.hosts[h].to_s + '/'
+      print find + "  " + replace + "\n"
       content.gsub!(find,replace)
     end
     return content
@@ -66,16 +72,21 @@ class JWPServlet < HTTPServlet::AbstractServlet
       return response.body = "not found"
     end
     port = request.port.to_i
-    path = clean_path(request.path)
+    host = format_host(port)
+    path = clean_path(host,request.request_uri.to_s)
     
     if @ctrl.paths[port] == nil
-      return response.body = "'" + format_host(port) + "' is not found in the database\n"
+      txt = "'" + host + "' is not found in the database\n"
+      print "can't serve " + txt
+      return response.body = txt
     elsif @ctrl.paths[port][path] == nil
-      return response.body = "'" + format_host(port) + "/" + path + "' is not found in the database\n"
+      txt = "'" + host + "/" + path + "' is not found in the database\n"
+      print "can't serve " + txt
+      return response.body = txt
     end
     
     id = @ctrl.paths[port][path]
-    print "served '" + format_host(port) + "/" + path + "' id=" + id.to_s + "\n"
+    print "served '" + host + "/" + path + "' id=" + id.to_s + "\n"
     
     s = Static.find(id)
     
@@ -92,12 +103,12 @@ class JWPServlet < HTTPServlet::AbstractServlet
       response[key] = value
     end
     
-    if response["Content-Type"] == "text/html"
+    if response["Content-Type"] =~ /text\/html/
       response.body = replace_hosts(s.contents)
     else
       response.body = s.contents
     end
-    
+        
   end
   
   def do_POST(request, response)
