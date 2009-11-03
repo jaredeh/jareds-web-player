@@ -1,0 +1,15 @@
+The testcase intercepts at the highest level
+ * slots for dynamic pages
+ * mostly the current list of bindings for the present test case
+
+Standard language for stages, triggered externally.
+ For example:
+  * first pass at advertised orders passes nuthin
+  * second pass has an order
+ Needs to be scriptable from the outside...
+
+
+Static - pages of stuff
+Default - maps out the default link of path to page in Static
+
+

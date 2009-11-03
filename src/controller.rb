@@ -38,9 +38,9 @@ class Controller
   end
   
   def initialize_host(host)
-    print "initialize_host(" + host.to_s + ")\n"
+    #print "initialize_host(" + host.to_s + ")\n"
     if @hosts[host] == nil
-      print "@port = " + @port.to_s + "\n"
+      #print "@port = " + @port.to_s + "\n"
       @hosts[host] = @port
       @port += 1
     end
@@ -58,7 +58,7 @@ class Controller
     txt += "=" + port.to_s
     txt += "','" + path
     txt += "','" + id.to_s + "')\n"
-    print txt
+    #print txt
     @paths[port][path] = id
   end
   

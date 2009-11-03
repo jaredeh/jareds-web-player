@@ -51,8 +51,11 @@ class JWPServlet < HTTPServlet::AbstractServlet
     #filter.push("Server")
     filter.push("Expires")
     filter.push("Content-Encoding")
+    filter.push("Content-Length")
     #filter.push("Cache-Control")
     #filter.push("Connection")
+    #filter.push("Set-Cookie")
+    #filter.push("X-Content-Type-Options")
     return filter
   end
   
@@ -61,13 +64,37 @@ class JWPServlet < HTTPServlet::AbstractServlet
     @ctrl.hosts.keys.each do |h|
       find = 'http://' + h +'/'
       replace = 'http://localhost:' + @ctrl.hosts[h].to_s + '/'
-      print find + "  " + replace + "\n"
+      #print find + "  " + replace + "\n"
       content.gsub!(find,replace)
     end
     return content
   end
   
-  def do_GET(request, response)
+  def filter_header(response,row)
+    filter = set_filter
+    header = parse_header(row.response_header)
+    #printme(header)    
+    header.each do |key,value|
+      if filter.include?(key)
+        next
+      end
+      response[key] = value
+    end
+  end
+  
+  def clean_hosts_from_response(response,row)
+    if response["Content-Type"] =~ /text\/html/
+      response.body = replace_hosts(row.contents)
+    elsif response["Content-Type"] =~ /text\/css/
+      response.body = replace_hosts(row.contents)
+    elsif response["Content-Type"] =~ /text\/plain/
+      response.body = replace_hosts(row.contents)
+    else
+      response.body = row.contents
+    end
+  end
+  
+  def do_process(request, response)  
     if request.path == nil
       return response.body = "not found"
     end
@@ -76,43 +103,38 @@ class JWPServlet < HTTPServlet::AbstractServlet
     path = clean_path(host,request.request_uri.to_s)
     
     if @ctrl.paths[port] == nil
-      txt = "'" + host + "' is not found in the database\n"
-      print "can't serve " + txt
-      return response.body = txt
+      print "can't serve " + "'" + host + "' is not found in the database\n"
+      return response.body = "'" + host + "' is not found in the database\n"
     elsif @ctrl.paths[port][path] == nil
-      txt = "'" + host + "/" + path + "' is not found in the database\n"
-      print "can't serve " + txt
-      return response.body = txt
+      print "can't serve " + "'" + host + "' is not found in the database\n"
+      return response.body = "'" + host + "' is not found in the database\n"
     end
     
     id = @ctrl.paths[port][path]
     print "served '" + host + "/" + path + "' id=" + id.to_s + "\n"
     
     s = Static.find(id)
-    
-    data = parse_header(s.response_header)
-    
-    #printme(data)
-    
-    filter = set_filter
-    
-    data.each do |key,value|
-      if filter.include?(key)
-        next
-      end
-      response[key] = value
-    end
-    
-    if response["Content-Type"] =~ /text\/html/
-      response.body = replace_hosts(s.contents)
-    else
-      response.body = s.contents
-    end
-        
+    filter_header(response,s)
+    clean_hosts_from_response(response,s)
+    return response.body
   end
   
   def do_POST(request, response)
-    return do_GET(request, response)
+    start = Time.now
+    ret = do_process(request, response)
+    stop = Time.now
+    elapsed = stop - start
+    #print "\ttime elapsed: " + elapsed.to_s + " sec\n"
+    return ret
   end
-
+  
+  def do_GET(request, response)
+    start = Time.now
+    ret = do_process(request, response)
+    stop = Time.now
+    elapsed = stop - start
+    #print "\ttime elapsed: " + elapsed.to_s + " sec\n"
+    return ret
+  end
+  
 end
