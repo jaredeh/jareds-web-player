@@ -1,10 +1,13 @@
 require File.join(File.dirname(__FILE__),'database.rb')
+require File.join(File.dirname(__FILE__),'host.rb')
 
 class Controller
   
   attr_accessor :hosts, :paths
   
-  def initialize(port = 3000)
+  def initialize(port = 3000, host_objs = nil)
+    @host_objs = host_objs
+    @custom = Hash.new
     @hosts = Hash.new
     @paths = Hash.new
     @port = port
@@ -60,6 +63,52 @@ class Controller
     txt += "','" + id.to_s + "')\n"
     #print txt
     @paths[port][path] = id
+  end
+  
+  def set_custom(host,path,id)
+    port = @hosts[host]
+    if @custom[port] == nil
+      @custom[port] = Hash.new
+    end
+    @custom[port][path] = id
+  end
+  
+  def get_default_map(port,path)
+    if @paths[port] == nil
+      return nil
+    end
+    if @paths[port][path] == nil
+      return nil
+    end
+    return @paths[port][path]
+  end
+  
+  def get_custom_map(port,path)
+    if @custom[port] == nil
+      return nil
+    end
+    if @custom[port][path] == nil
+      return nil
+    end
+    return @custom[port][path]
+  end
+  
+  def get_id(port,path)
+    
+    if @host_objs[port.to_i] != nil
+      @host_objs[port.to_i].hit(path)
+    end
+    
+    id = get_custom_map(port,path)
+    if id != nil
+      return id
+    end
+    
+    id = get_default_map(port,path)
+    if id != nil
+      return id
+    end
+    raise "can't serve " + "'http://localhost:" + port.to_s + "/" + path.to_s + "' is not found in the database\n"
   end
   
 end

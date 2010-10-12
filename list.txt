@@ -1,3 +1,9 @@
+Shoes app ideas:
+
+start up server.  display hosts and host activities with blinkenlites with resource.  log data to top of para. keep threads in app so they can die with app. display location of "root pages" and control app.
+
+maybe this can be done in shoes! make "path" browser in web control app.  "paths" can be selected in path list with associated number of unique pages that path points to.  Probably needs sorting, searching capability.  "path" then browsed with prev, next and set as default controls on top.
+
 The testcase intercepts at the highest level
  * slots for dynamic pages
  * mostly the current list of bindings for the present test case
@@ -12,4 +18,8 @@ Standard language for stages, triggered externally.
 Static - pages of stuff
 Default - maps out the default link of path to page in Static
 
+
+change mapping - host, path, key
+
+database browser
 

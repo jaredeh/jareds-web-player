@@ -102,15 +102,7 @@ class JWPServlet < HTTPServlet::AbstractServlet
     host = format_host(port)
     path = clean_path(host,request.request_uri.to_s)
     
-    if @ctrl.paths[port] == nil
-      print "can't serve " + "'" + host + "' is not found in the database\n"
-      return response.body = "'" + host + "' is not found in the database\n"
-    elsif @ctrl.paths[port][path] == nil
-      print "can't serve " + "'" + host + "' is not found in the database\n"
-      return response.body = "'" + host + "' is not found in the database\n"
-    end
-    
-    id = @ctrl.paths[port][path]
+    id = @ctrl.get_id(port,path)
     print "served '" + host + "/" + path + "' id=" + id.to_s + "\n"
     
     s = Static.find(id)
