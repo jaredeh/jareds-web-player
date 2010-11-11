@@ -3,17 +3,26 @@ require File.join(File.dirname(__FILE__),'host.rb')
 
 class Controller
   
-  attr_accessor :hosts, :paths
+  attr_accessor :hosts, :paths, :ids, :control_app_port
   
-  def initialize(port = 3000, host_objs = nil)
+  def initialize(port = 3000, host_objs = nil, control_app_port = nil)
     @host_objs = host_objs
     @custom = Hash.new
     @hosts = Hash.new
     @paths = Hash.new
+    @ids = Hash.new
+    @control_app_port = control_app_port
     @port = port
     Static.find(:all).each do |s|
       initialize_host(s.host)
       initialize_path(s.host,s.path,s.id)
+      if @ids[s.host] == nil
+        @ids[s.host] = Hash.new
+      end
+      if @ids[s.host][s.path] == nil
+        @ids[s.host][s.path] = Array.new
+      end
+      @ids[s.host][s.path].push(s.id)
     end
     print_url(1)
     print_url(2)

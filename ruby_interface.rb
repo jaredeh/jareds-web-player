@@ -58,40 +58,16 @@ class JWP
 
 end
 
-Shoes.setup do
-  gem "activerecord"
-end
 
 
-Shoes.app :width => 400, :margin => 10 do
+class Fun
   
   def start_serving
     sleep(1)
     Thread.new {@j.run}
   end
-  
-  def do_colors
-    @hosts.each do |port,v|
-      r,g,b = JSH.color_it(@j.hosts[port].heat)
-      v.fill = rgb(r,g,b)
-    end
-  end
-  
-  def add_hosts
-    flow do
-      @j.hosts.each_value do |host|
-        s = host.hostname.to_s + "[" + host.port.to_s + "]"
-        v = para s
-        v.size = "xx-small"
-        v.margin_top = 0
-        v.margin_bottom = 0
-        v.leading = 0
-        v.fill = rgb(0,0,255)
-        @hosts[host.port] = v
-      end
-    end
-  end
-  
+    
+  def initialize
   @j = JWP.new
   @hosts = Hash.new
   
@@ -101,15 +77,16 @@ Shoes.app :width => 400, :margin => 10 do
     sleep(0.01)
   end
   
-  para "Start here"
-  para ( link "http://" + @j.hosts[@j.port].hostname.to_s, :click => "http://localhost:" + @j.port.to_s )
+  print "Start here"
+  print "http://" + @j.hosts[@j.port].hostname.to_s
   
-  para "\n"
-  para ( link "Control Interface", :click => "http://localhost:" + @j.control_app_port.to_s )
+  print "\n"
+  print "Control Interface" + "http://localhost:" + @j.control_app_port.to_s
   
-  add_hosts
-  animate(100) do
-    do_colors
+  
   end
   
 end
+
+Fun.new
+    Thread.list.each {|t| t.join}
