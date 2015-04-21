@@ -1,0 +1,1 @@
+Takes data from jareds-web-recorder and allows the user to play back the recorded webtraffic in the form of a local hosted website.  Allows the user to test client webtools such as greasemonkey scripts.
